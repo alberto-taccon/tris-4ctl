@@ -1,4 +1,4 @@
-# TRIS
+# TRIS
 Alberto Taccon, Natan Cavina, Federico Poli
 
 ## SUDDIVISONE DEI RUOLI
