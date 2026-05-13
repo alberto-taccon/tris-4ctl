@@ -133,12 +133,56 @@ def inserisci_match_results(connection, id_m_u, id_user_vincitore=None):
     params = (id_m_u, id_user_vincitore)
     return esegui_dml(connection, query, params)
 
-def inserisci_vittoria(connection, id_match, cf):
-    if connection is None or id_match is None:
+def inserisci_vittoria(connection, id_match_results, id_user_vincitore):
+    if connection is None or id_match_results is None:
         return None
 
-    query = "UPDATE match_results SET id_user_vincitore = %s WHERE id_match_results = %s"
-    params = (cf, id_match)
+    query = """
+        UPDATE match_results
+        SET id_user_vincitore = %s
+        WHERE id_match_results = %s
+    """
+    params = (id_user_vincitore, id_match_results)
+    esegui_dml(connection, query, params)
+
+    # recupero i due giocatori della partita
+    query = """
+        SELECT mu.id_user_1, mu.id_user_2
+        FROM match_results mr
+        JOIN match_users mu ON mr.id_m_u = mu.id_m_u
+        WHERE mr.id_match_results = %s
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(query, (id_match_results,))
+        riga = cursor.fetchone()
+
+    if riga:
+        id_user_1, id_user_2 = riga
+        aggiorna_vittoria(connection, id_user_1)
+        aggiorna_vittoria(connection, id_user_2)
+
+    return True
+
+def aggiorna_vittoria(connection, id_user):
+    if connection is None or id_user is None:
+        return None
+
+    query = """
+        UPDATE users u
+        SET u.winrate = (
+            SELECT COALESCE(
+                SUM(CASE WHEN mr.id_user_vincitore = u.id_user THEN 1 ELSE 0 END) * 100.0
+                / NULLIF(COUNT(mu.id_m_u), 0),
+                0
+            )
+            FROM match_users mu
+            LEFT JOIN match_results mr ON mr.id_m_u = mu.id_m_u
+            WHERE mu.id_user_1 = u.id_user
+               OR mu.id_user_2 = u.id_user
+        )
+        WHERE u.id_user = %s
+    """
+    params = (id_user,)
     return esegui_dml(connection, query, params)
 
 def classifica_vittorie(connection, limite):
