@@ -4,7 +4,7 @@ Alberto Taccon, Natan Cavina, Federico Poli
 ## SUDDIVISONE DEI RUOLI
 Codice python: Alberto Taccon
 Schema relazionale + foto: Natan Cavina
-Descrizione progetto: Alberto Taccon & Natan Cavina
+Descrizione progetto: Alberto Taccon & Federico Poli
 
 ## DESCRIZIONE
 Il progetto consiste in una versione del gioco del Tris realizzata in Python ed eseguibile da terminale. Due giocatori inseriscono il proprio nome e codice fiscale, poi si alternano scegliendo le coordinate della casella in cui posizionare il proprio simbolo: il giocatore 1 utilizza `X`, mentre il giocatore 2 utilizza `O`.
